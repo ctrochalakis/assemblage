@@ -55,7 +55,7 @@ namespace :assemble do
     jar = File.join(File.dirname(__FILE__), "..", "..", "bin", "closure-compiler.jar")
     target = Rails.root.join("public/javascripts/bundle_#{bundle_name}.js")
     
-    `java -jar #{jar} #{files.join(" --js ")} --js_output_file #{target}`
+    `java -jar #{jar} --js #{files.join(" --js ")} --js_output_file #{target}`
     
     return target
   end
