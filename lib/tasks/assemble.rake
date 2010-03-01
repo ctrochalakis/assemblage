@@ -1,4 +1,7 @@
 require 'find'
+unless defined?(RAILS_ROOT)
+  RAILS_ROOT = ENV['RAILS_ROOT']
+end
 
 namespace :assemble do
   task :all => [ :js, :css ]
@@ -8,9 +11,8 @@ namespace :assemble do
     targets = []
     
     paths.each do |bundle_directory|
-      bundle_name = bundle_directory.basename
+      bundle_name = File.basename(bundle_directory)
       files = recursive_file_list(bundle_directory, ".js")
-      
       next if files.empty? || bundle_name == "dev"
           
       target = execute_closure(files, bundle_name)
@@ -28,7 +30,7 @@ namespace :assemble do
     targets = []
         
     paths.each do |bundle_directory|
-      bundle_name = bundle_directory.basename
+      bundle_name = File.basename(bundle_directory)
       files = recursive_file_list(bundle_directory, ".css")
       
       next if files.empty? || bundle_name == 'dev'
@@ -53,7 +55,7 @@ namespace :assemble do
   
   def execute_closure(files, bundle_name)
     jar = File.join(File.dirname(__FILE__), "..", "..", "bin", "closure-compiler.jar")
-    target = Rails.root.join("public/javascripts/bundle_#{bundle_name}.js")
+    target = File.join(RAILS_ROOT ,"public/javascripts/bundle_#{bundle_name}.js")
     
     `java -jar #{jar} --js #{files.join(" --js ")} --js_output_file #{target}`
     
@@ -62,7 +64,7 @@ namespace :assemble do
   
   def execute_yui_compressor(bundle, bundle_name)
     jar = File.join(File.dirname(__FILE__), "..", "..", "bin", "yui-compressor.jar")
-    target = Rails.root.join("public/stylesheets/bundle_#{bundle_name}.css")
+    target = File.join(RAILS_ROOT,"public/stylesheets/bundle_#{bundle_name}.css")
     temp_file = "/tmp/bundle_raw.css"
     
     File.open(temp_file, 'w') { |f| f.write(bundle) }
@@ -91,10 +93,10 @@ namespace :assemble do
   end
   
   def get_top_level_directories(base_path)
-    Dir.entries(Rails.root.join(base_path)).collect do |path|
-      path = Rails.root.join("#{base_path}/#{path}")
+    Dir.entries(File.join(RAILS_ROOT, base_path)).collect do |path|
+      path = File.join(RAILS_ROOT, "#{base_path}/#{path}")
       
-      File.basename(path)[0] == ?. || !File.directory?(path) ? nil : Pathname.new(path) # not dot directories or files
+      File.basename(path)[0] == ?. || !File.directory?(path) ? nil : path # not dot directories or files
     end - [nil]
   end
 end
