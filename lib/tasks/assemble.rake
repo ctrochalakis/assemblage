@@ -7,8 +7,11 @@ require 'grit'
 GIT_ID = Grit::Repo.new(RAILS_ROOT).log('HEAD', 'public/', :max_count => 1).first.id
 
 namespace :assemble do
+
+  desc "Compile both js and css files"
   task :all => [ :js, :css ]
 
+  desc "Compile js files"
   task :js do
     if public_changed?
       paths = get_top_level_directories("public/javascripts")
@@ -30,6 +33,7 @@ namespace :assemble do
     end
   end
 
+  desc "Compile css files"
   task :css do
     if public_changed?
       paths = get_top_level_directories("public/stylesheets")
