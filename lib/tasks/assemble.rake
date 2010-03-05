@@ -4,7 +4,6 @@ unless defined?(RAILS_ROOT)
 end
 
 require 'grit'
-GIT_ID = Grit::Repo.new(RAILS_ROOT).log('HEAD', 'public/', :max_count => 1).first.id
 
 namespace :assemble do
 
@@ -13,7 +12,7 @@ namespace :assemble do
 
   desc "Compile js files"
   task :js do
-    if public_changed?
+    if asset_changed?(:javascripts)
       paths = get_top_level_directories("public/javascripts")
       targets = []
       paths.each do |bundle_directory|
@@ -29,13 +28,13 @@ namespace :assemble do
       targets.each do |target|
         puts "=> Assembled JavaScript at: #{target}"
       end
-      write_id
+      write_id(:javascripts)
     end
   end
 
   desc "Compile css files"
   task :css do
-    if public_changed?
+    if asset_changed?(:stylesheets)
       paths = get_top_level_directories("public/stylesheets")
       targets = []
 
@@ -59,7 +58,7 @@ namespace :assemble do
       targets.each do |target|
         puts "=> Assembled CSS at: #{target}"
       end
-      write_id
+      write_id(:stylesheets)
     end
 
   end
@@ -116,21 +115,25 @@ namespace :assemble do
   def get_top_level_directories(base_path)
     Dir.entries(File.join(RAILS_ROOT, base_path)).collect do |path|
       path = File.join(RAILS_ROOT, "#{base_path}/#{path}")
-
+      
       File.basename(path)[0] == ?. || !File.directory?(path) ? nil : path # not dot directories or files
     end - [nil]
   end
 
-  def public_changed?
-    path = File.join(RAILS_ROOT, '.assemble_id')
+  def asset_hash(for_asset)
+    Grit::Repo.new(RAILS_ROOT).log('HEAD', "public/#{for_asset}", :max_count => 1).first.id
+  end
+  
+  def asset_changed?(for_asset)
+    path = File.join(RAILS_ROOT, ".assemble_#{for_asset}_hash")
     return true unless File.exists?(path)
     last_git_id = open(path, 'r').read.chomp
-    last_git_id != GIT_ID
+    last_git_id != asset_hash(for_asset)
   end
 
-  def write_id
-    open(File.join(RAILS_ROOT, '.assemble_id'), 'w') do |f|
-      f.write(GIT_ID + "\n")
+  def write_id(for_asset)
+    open(File.join(RAILS_ROOT, ".assemble_#{for_asset}_hash"), 'w') do |f|
+      f.write(asset_hash(for_asset) + "\n")
     end
   end
 
