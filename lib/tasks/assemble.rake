@@ -60,6 +60,14 @@ namespace :assemble do
 
   end
 
+  desc "Assemblage asset building summary"
+  task :help do
+    puts <<-HELP
+    This is an asset building recipe based on http://github.com/voxxit/assemblage
+    As an added feature, everytime js/css files are compiled assemblage stores the
+    commit id. This way assets are compiled only once and not every time.
+    HELP
+  end
   private
 
   def execute_closure(files, bundle_name)
