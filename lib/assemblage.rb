@@ -3,7 +3,8 @@ require 'find'
 module Assemblage
   module ViewHelpers
     def bundle_files?
-      Rails.env.production? || Rails.env.staging? || params[:bundle] || cookies[:bundle] == "yes"
+      return false if params.has_key? :nobundle
+      Rails.env.production? || Rails.env.staging? || params.has_key?(:bundle) || cookies[:bundle] == "yes"
     end
 
     def javascript_bundle(*sources)
