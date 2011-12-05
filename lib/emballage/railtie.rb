@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module Emballage
   class Railtie < Rails::Railtie
     initializer "emballage.initializer" do
