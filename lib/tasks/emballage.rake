@@ -1,11 +1,6 @@
-require 'find'
-unless defined?(RAILS_ROOT)
-  RAILS_ROOT = ENV['RAILS_ROOT']
-end
+require 'emballage'
 
-require 'grit'
-
-namespace :assemble do
+namespace :emballage do
 
   desc "Compile both js and css files"
   task :all => [ :js, :css ]
@@ -67,7 +62,7 @@ namespace :assemble do
   task :help do
     puts <<-HELP
     This is an asset building recipe based on http://github.com/voxxit/assemblage
-    As an added feature, everytime js/css files are compiled assemblage stores the
+    As an added feature, everytime js/css files are compiled emballage stores the
     commit id. This way assets are compiled only once and not every time.
     HELP
   end
@@ -75,7 +70,7 @@ namespace :assemble do
 
   def execute_closure(files, bundle_name)
     jar = File.join(File.dirname(__FILE__), "..", "..", "bin", "closure-compiler.jar")
-    target = File.join(RAILS_ROOT ,"public/javascripts/bundle_#{bundle_name}.js")
+    target = File.join(Emballage.root, "public/javascripts/bundle_#{bundle_name}.js")
 
     `java -jar #{jar} --js #{files.join(" --js ")} --js_output_file #{target}`
 
@@ -84,7 +79,7 @@ namespace :assemble do
 
   def execute_yui_compressor(bundle, bundle_name)
     jar = File.join(File.dirname(__FILE__), "..", "..", "bin", "yui-compressor.jar")
-    target = File.join(RAILS_ROOT,"public/stylesheets/bundle_#{bundle_name}.css")
+    target = File.join(Emballage.root, "public/stylesheets/bundle_#{bundle_name}.css")
     temp_file = "/tmp/bundle_raw.css"
 
     File.open(temp_file, 'w') { |f| f.write(bundle) }
@@ -113,26 +108,28 @@ namespace :assemble do
   end
 
   def get_top_level_directories(base_path)
-    Dir.entries(File.join(RAILS_ROOT, base_path)).collect do |path|
-      path = File.join(RAILS_ROOT, "#{base_path}/#{path}")
+    x = File.join(Emballage.root, base_path)
+    p x
+    Dir.entries(File.join(Emballage.root, base_path)).collect do |path|
+      path = File.join(Emballage.root, "#{base_path}/#{path}")
       
       File.basename(path)[0] == ?. || !File.directory?(path) ? nil : path # not dot directories or files
     end - [nil]
   end
 
   def asset_hash(for_asset)
-    Grit::Repo.new(RAILS_ROOT).log('HEAD', "public/#{for_asset}", :max_count => 1).first.id
+    Grit::Repo.new(Emballage.root).log('HEAD', "public/#{for_asset}", :max_count => 1).first.id
   end
   
   def asset_changed?(for_asset)
-    path = File.join(RAILS_ROOT, ".assemble_#{for_asset}_hash")
+    path = File.join(Emballage.root, ".emballage_#{for_asset}_hash")
     return true unless File.exists?(path)
     last_git_id = open(path, 'r').read.chomp
     last_git_id != asset_hash(for_asset)
   end
 
   def write_id(for_asset)
-    open(File.join(RAILS_ROOT, ".assemble_#{for_asset}_hash"), 'w') do |f|
+    open(File.join(Emballage.root, ".emballage_#{for_asset}_hash"), 'w') do |f|
       f.write(asset_hash(for_asset) + "\n")
     end
   end

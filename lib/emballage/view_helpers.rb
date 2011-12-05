@@ -1,6 +1,6 @@
 require 'find'
 
-module Assemblage
+module Emballage
   module ViewHelpers
     def bundle_files?
       return false if params.has_key? :nobundle
@@ -80,7 +80,7 @@ module Assemblage
 
     def recursive_file_list(basedir, extname)
       files = []
-      basedir = Rails.root.join("public", basedir)
+      basedir = Rails.root.join("public", basedir).to_s
       
       Find.find(basedir) do |path|
         if FileTest.directory?(path)
@@ -91,7 +91,7 @@ module Assemblage
           end
         end
       
-        files << path.gsub(Rails.root, '') if File.extname(path) == extname
+        files << path.gsub(Rails.root.to_s, '') if File.extname(path) == extname
       end
       
       files.sort
