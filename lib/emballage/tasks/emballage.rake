@@ -107,7 +107,6 @@ namespace :emballage do
 
   def get_top_level_directories(base_path)
     x = File.join(Emballage.root, base_path)
-    p x
     Dir.entries(File.join(Emballage.root, base_path)).collect do |path|
       path = File.join(Emballage.root, "#{base_path}/#{path}")
       
