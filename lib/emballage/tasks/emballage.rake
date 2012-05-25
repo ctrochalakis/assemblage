@@ -10,7 +10,7 @@ namespace :emballage do
   desc "Compile js files"
   task :js do
     if asset_changed?(:javascripts)
-      paths = get_top_level_directories("public/javascripts")
+      paths = get_bundle_directories("public/javascripts")
       targets = []
       paths.each do |bundle_directory|
         bundle_name = File.basename(bundle_directory)
@@ -29,7 +29,7 @@ namespace :emballage do
   desc "Compile css files"
   task :css do
     if asset_changed?(:stylesheets)
-      paths = get_top_level_directories("public/stylesheets")
+      paths = get_bundle_directories("public/stylesheets")
       targets = []
 
       paths.each do |bundle_directory|
@@ -105,13 +105,10 @@ namespace :emballage do
     files.sort
   end
 
-  def get_top_level_directories(base_path)
-    x = File.join(Emballage.root, base_path)
-    Dir.entries(File.join(Emballage.root, base_path)).collect do |path|
-      path = File.join(Emballage.root, "#{base_path}/#{path}")
-      
-      File.basename(path)[0] == ?. || !File.directory?(path) ? nil : path # not dot directories or files
-    end - [nil]
+  def get_bundle_directories(base_path)
+    Dir["#{File.join(Emballage.root, base_path)}/*/bundle.me"].map { |path|
+      File.dirname(path)
+    }
   end
 
   def asset_hash(for_asset)
