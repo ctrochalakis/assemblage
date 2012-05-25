@@ -74,7 +74,8 @@ namespace :emballage do
     jar = File.join(File.dirname(__FILE__), "..", "..", "..", "bin", "closure-compiler.jar")
     target = File.join(Emballage.root, "public/javascripts/bundle_#{bundle_name}.js")
 
-    `java -jar #{jar} --js #{files.join(" --js ")} --js_output_file #{target}`
+    code = system(%Q/java -jar #{jar} --warning_level QUIET --js #{files.join(" --js ")} --js_output_file #{target}/)
+    raise "closure returned non-zero exit code!" if !code
 
     return target
   end
@@ -86,7 +87,9 @@ namespace :emballage do
 
     File.open(temp_file, 'w') { |f| f.write(bundle) }
 
-    `java -jar #{jar} --line-break 0 #{temp_file} -o #{target}`
+    code = system(%Q/java -jar #{jar} --line-break 0 #{temp_file} -o #{target}/)
+    raise "closure returned non-zero exit code!" if !code
+
 
     return target
   end
