@@ -18,13 +18,10 @@ namespace :emballage do
         next if files.empty? || bundle_name == "dev"
 
         target = execute_closure(files, bundle_name)
-
-        targets << target
-      end
-
-      targets.each do |target|
         puts "=> Assembled JavaScript at: #{target}"
+
       end
+
       write_id(:javascripts)
     end
   end
@@ -48,13 +45,9 @@ namespace :emballage do
         end
 
         target = execute_yui_compressor(bundle, bundle_name)
-
-        targets << target
-      end
-
-      targets.each do |target|
         puts "=> Assembled CSS at: #{target}"
       end
+
       write_id(:stylesheets)
     end
 
