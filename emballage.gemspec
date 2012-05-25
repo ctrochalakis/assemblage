@@ -13,9 +13,9 @@ Gem::Specification.new do |s|
 
   s.files             = %w( README.rdoc MIT-LICENSE )
   s.files            += Dir.glob("lib/**/*.rb")
+  s.files            += Dir.glob("lib/**/*.rake")
+  s.files            += Dir.glob("bin/*.jar")
 
   s.add_dependency('grit')
-  s.description       = <<desc
-  Feed me.
-desc
+  s.description       = 'Modified github recipe for asset packaging'
 end
