@@ -71,7 +71,7 @@ namespace :emballage do
   private
 
   def execute_closure(files, bundle_name)
-    jar = File.join(File.dirname(__FILE__), "..", "..", "bin", "closure-compiler.jar")
+    jar = File.join(File.dirname(__FILE__), "..", "..", "..", "bin", "closure-compiler.jar")
     target = File.join(Emballage.root, "public/javascripts/bundle_#{bundle_name}.js")
 
     `java -jar #{jar} --js #{files.join(" --js ")} --js_output_file #{target}`
@@ -80,7 +80,7 @@ namespace :emballage do
   end
 
   def execute_yui_compressor(bundle, bundle_name)
-    jar = File.join(File.dirname(__FILE__), "..", "..", "bin", "yui-compressor.jar")
+    jar = File.join(File.dirname(__FILE__), "..", "..", "..", "bin", "yui-compressor.jar")
     target = File.join(Emballage.root, "public/stylesheets/bundle_#{bundle_name}.css")
     temp_file = "/tmp/bundle_raw.css"
 

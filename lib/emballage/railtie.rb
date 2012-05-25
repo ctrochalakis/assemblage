@@ -6,7 +6,9 @@ module Emballage
     end
 
     rake_tasks do
-      load "tasks/emballage.rake"
+       Dir[File.join(File.dirname(__FILE__),'tasks/*.rake')].each { |f|
+         load f
+       }
     end
   end
 end
